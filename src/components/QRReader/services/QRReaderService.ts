@@ -19,6 +19,6 @@ export default class QRReaderService {
   }
 
   stopDecoding() {
-    this.reader.stopAsyncDecode();
+    this.reader.stopContinuousDecode();
   }
 }

@@ -47,7 +47,7 @@ const Success = ({ className }: ISuccessProps) => {
 const StyledSuccess = styled(Success)`
   display: grid;
   grid-template-columns: max-content;
-  grid-template-rows: 90% auto;
+  grid-template-rows: 70% auto;
   justify-content: center;
   align-items: center;
   text-align: center;

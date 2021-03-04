@@ -21,10 +21,9 @@ const QRReader = ({ className, onSuccessScan, onErrorScan }: QRReaderProps) => {
   const [isScaning, setIsScaning] = useState<boolean>(false);
   const [selectedDeviceId, setSelectedDeviceId] = useState<string | null>(null);
 
-  const handleOnScanClick = useCallback(() => {
-    if (selectedDeviceId) {
-      setIsScaning(true);
-      qrService.decode(selectedDeviceId, (result, err) => {
+  const startDecoding = useCallback(
+    (deviceId: string) => {
+      qrService.decode(deviceId, (result, err) => {
         if (result) {
           const text = result.getText();
           if (onSuccessScan) onSuccessScan(text);
@@ -33,8 +32,25 @@ const QRReader = ({ className, onSuccessScan, onErrorScan }: QRReaderProps) => {
           if (onErrorScan) onErrorScan(err);
         }
       });
+    },
+    [onErrorScan, onSuccessScan, qrService]
+  );
+
+  const handleOnScanClick = useCallback(() => {
+    if (selectedDeviceId) {
+      setIsScaning(true);
+      startDecoding(selectedDeviceId);
     }
-  }, [onErrorScan, onSuccessScan, qrService, selectedDeviceId]);
+  }, [selectedDeviceId, startDecoding]);
+
+  const handleDeviceChange = useCallback(
+    (deviceId: string) => {
+      setSelectedDeviceId(deviceId);
+      qrService.stopDecoding();
+      startDecoding(deviceId);
+    },
+    [qrService, startDecoding]
+  );
 
   useEffect(() => {
     qrService.getDevicesList().then((devices) => {
@@ -54,7 +70,7 @@ const QRReader = ({ className, onSuccessScan, onErrorScan }: QRReaderProps) => {
           <DevicesList
             mediaDeviceInfo={devices}
             defaultValue={selectedDeviceId}
-            onDeviceChange={setSelectedDeviceId}
+            onDeviceChange={handleDeviceChange}
           />
         </div>
       )}
